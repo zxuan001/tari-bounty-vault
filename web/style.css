@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 860px; margin: 0 auto; padding: 16px; background: #0f1115; color: #e8e8e8; line-height: 1.5; }
+header h1 { margin: 0 0 4px; font-size: 2rem; }
+.tagline { color: #b9c0cc; margin: 0 0 8px; }
+.sim-badge { display: inline-block; background: #f5c518; color: #111; font-weight: 700; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; }
+.tabs { margin: 18px 0; display: flex; gap: 8px; }
+.tabs button { background: #1d2230; color: #e8e8e8; border: 1px solid #333a4d; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+.tabs button.active { background: #2f6fed; border-color: #2f6fed; }
+.card { background: #171a21; border: 1px solid #262b38; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+.card h2 { margin-top: 0; font-size: 1.15rem; }
+label { display: block; margin: 10px 0; font-weight: 600; }
+input, textarea { display: block; width: 100%; margin-top: 4px; padding: 8px; border-radius: 6px; border: 1px solid #333a4d; background: #0f1115; color: #e8e8e8; font: inherit; }
+button { background: #2f6fed; color: #fff; border: none; padding: 9px 14px; border-radius: 6px; cursor: pointer; font: inherit; margin: 4px 4px 4px 0; }
+button:hover { background: #3b7bff; }
+.roles .role { background: #1d2230; border: 1px solid #333a4d; }
+.roles .role.active { background: #2f6fed; border-color: #2f6fed; }
+.hint, .hashline { color: #b9c0cc; font-size: 0.92rem; }
+code { background: #0f1115; border: 1px solid #262b38; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+.call { color: #7ee2a8; font-size: 0.92rem; word-break: break-word; }
+.error { color: #ff8a8a; font-weight: 600; }
+dl { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; margin: 0; }
+dt { color: #b9c0cc; }
+dd { margin: 0; word-break: break-all; }
+#events li { margin-bottom: 10px; }
+footer { color: #8a93a6; font-size: 0.85rem; margin-top: 20px; }

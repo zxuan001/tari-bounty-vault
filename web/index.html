@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BountyVault — on-chain escrow for bug bounties on Tari Ootle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>BountyVault</h1>
+  <p class="tagline">On-chain escrow for bug bounties on Tari Ootle. A sponsor locks the bounty, a hunter submits a report hash, the sponsor pays or rejects, a referee settles disputes — and unclaimed bounties refund after the deadline.</p>
+  <p class="sim-badge">DEMO SIMULATION — no wallet, no real funds. Every action shows the Ootle call it maps to.</p>
+</header>
+
+<nav class="tabs">
+  <button id="tab-sim" class="active">Simulation demo</button>
+  <button id="tab-live">Live (Sapient / Esmeralda)</button>
+</nav>
+
+<main id="panel-sim">
+  <section class="card" id="actors">
+    <h2>1 · Act as</h2>
+    <p>The template checks <em>who</em> is calling. Pick a role — the demo enforces the same rules on-chain.</p>
+    <div class="roles">
+      <button data-role="sponsor" class="role active">Sponsor</button>
+      <button data-role="hunter" class="role">Hunter</button>
+      <button data-role="referee" class="role">Referee</button>
+      <button data-role="anyone" class="role">Anyone</button>
+    </div>
+    <p class="hint">You are acting as: <strong id="who">sponsor</strong>. The sponsor creates the bounty; the hunter submits; the referee resolves disputes; anyone can call <code>timeout</code> after the deadline.</p>
+  </section>
+
+  <section class="card" id="epoch-box">
+    <h2>2 · Chain epoch (simulated)</h2>
+    <p>Current epoch: <strong id="epoch">1000</strong> &nbsp;·&nbsp; deadline is an epoch, not a date — a mainnet epoch is about 20 minutes.</p>
+    <button id="epoch-plus">+1 epoch</button>
+    <button id="epoch-plus10">+10 epochs</button>
+    <button id="epoch-plus100">+100 epochs</button>
+  </section>
+
+  <section class="card" id="create-box">
+    <h2>3 · Create a bounty</h2>
+    <label>Amount (µT, microTari) <input id="amount" type="number" min="1" value="500000"></label>
+    <label>Scope (stays off-chain — only its hash goes on chain)
+      <textarea id="scope" rows="2">example.com — XSS, SQLi, auth bypass. Out of scope: DoS, spam, social engineering.</textarea></label>
+    <label>Deadline epoch <input id="deadline" type="number" value="1200"></label>
+    <p class="hashline">scope_hash: <code id="scope-hash">—</code></p>
+    <button id="create-btn">Create bounty</button>
+    <p class="call" id="create-call"></p>
+  </section>
+
+  <section class="card" id="status-box">
+    <h2>Bounty status</h2>
+    <dl id="status">
+      <dt>State</dt><dd id="st-state">— no bounty yet —</dd>
+      <dt>Vault balance</dt><dd id="st-vault">—</dd>
+      <dt>Sponsor</dt><dd id="st-sponsor">—</dd>
+      <dt>Referee</dt><dd id="st-referee">—</dd>
+      <dt>Deadline epoch</dt><dd id="st-deadline">—</dd>
+      <dt>Scope hash</dt><dd id="st-scope">—</dd>
+      <dt>Submission</dt><dd id="st-sub">—</dd>
+    </dl>
+  </section>
+
+  <section class="card" id="act-box">
+    <h2>4 · Act on the bounty</h2>
+    <label>Report (stays off-chain — only its hash goes on chain)
+      <textarea id="report" rows="2">Stored XSS in /search?q= — PoC: &lt;script&gt;…&lt;/script&gt; executes on the results page.</textarea></label>
+    <p class="hashline">report_hash: <code id="report-hash">—</code></p>
+    <div class="actions">
+      <button id="submit-btn">Submit report</button>
+      <button id="approve-btn">Approve — pay hunter</button>
+      <button id="reject-btn">Reject — reopen</button>
+      <button id="dispute-btn">Dispute</button>
+      <button id="resolve-pay-btn">Resolve — pay hunter</button>
+      <button id="resolve-refund-btn">Resolve — refund sponsor</button>
+      <button id="cancel-btn">Cancel — refund sponsor</button>
+      <button id="timeout-btn">Timeout — refund sponsor</button>
+    </div>
+    <p class="call" id="act-call"></p>
+    <p class="error" id="act-error"></p>
+  </section>
+
+  <section class="card" id="events-box">
+    <h2>Event log</h2>
+    <ol id="events"><li>No events yet.</li></ol>
+  </section>
+
+  <section class="card" id="how">
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>Create.</strong> The sponsor locks the full bounty in the component vault. State: <code>Open</code>.</li>
+      <li><strong>Submit.</strong> A hunter submits a <code>report_hash</code> (SHA-256 of the report). The report itself never goes on chain. State: <code>Submitted</code>.</li>
+      <li><strong>Approve</strong> pays the <em>whole</em> vault to the hunter. <strong>Reject</strong> clears the submission and reopens the bounty. State: <code>Paid</code> / <code>Open</code>.</li>
+      <li><strong>Dispute.</strong> If the hunter disagrees with a rejection path, they dispute. Funds stay locked. State: <code>Disputed</code>.</li>
+      <li><strong>Resolve.</strong> The referee — fixed at creation, never changeable — pays the hunter or refunds the sponsor. State: <code>Paid</code> / <code>Refunded</code>.</li>
+      <li><strong>Cancel / timeout.</strong> The sponsor can cancel while Open; anyone can call <code>timeout</code> once the deadline epoch passes. Both refund the whole vault to the sponsor. State: <code>Refunded</code>.</li>
+    </ol>
+    <p>Only hashes go on chain. The scope text and the report stay off-chain — that is the point: a public bounty board that does not leak what was found, or where.</p>
+  </section>
+</main>
+
+<main id="panel-live" hidden>
+  <section class="card">
+    <h2>Live path — not connected yet</h2>
+    <p>The <code>BountyVault</code> template has <strong>not been published</strong> to Esmeralda or to mainnet yet. This demo runs a walletless simulation of the exact same state machine.</p>
+    <p>When the template is published, this tab will show:</p>
+    <ul>
+      <li>the template address (<code>template_…</code>),</li>
+      <li>a Sapient wallet connect button, and</li>
+      <li>live create / submit / approve / dispute / resolve calls against the real network.</li>
+    </ul>
+    <p>Template address: <code id="template-address">not published yet</code></p>
+    <p>Until then, nothing here moves real funds — and nothing here pretends to.</p>
+  </section>
+</main>
+
+<footer>
+  <p>BountyVault — Tari November Build Contest, MVP theme. MIT licensed. Not audited; use small amounts on testnet first when the live path lands.</p>
+</footer>
+
+<script src="sim.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
